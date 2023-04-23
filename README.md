@@ -9,7 +9,7 @@ bof-NPPSPY local
 ```
 <b>Target remote host</b>
 ```texinfo
-bof-NPPSPY 
+bof-NPPSPY WS01
 ```
 ![](images/demo.png)
 
