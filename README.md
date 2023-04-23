@@ -9,7 +9,7 @@ bof-NPPSPY local
 ```
 <b>Target remote host</b>
 ```texinfo
-bof-NPPSPY WS01
+bof-NPPSPY 
 ```
 ![](images/demo.png)
 
@@ -17,10 +17,10 @@ bof-NPPSPY WS01
 cleanup command is provided as above
 ```texinfo
 local:
-bof-NPPSPY cleanup local <cleanupvalue>
+bof-NPPSPY local cleanup <cleanupvalue>
 
 remote:
-bof-NPPSPY cleanup WS01 <cleanupvalue>
+bof-NPPSPY WS01 cleanup <cleanupvalue>
 ```
 
 # Compile
