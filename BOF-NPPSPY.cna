@@ -32,6 +32,11 @@ alias bof-NPPSPY {
 		$handle = openf(script_resource("bof-NPPSPY $+ $barch $+ .o"));
 		$data = readb($handle, -1);
 		closef($handle);
+		if(strlen($data) < 1)
+		{
+			berror($1,"Error: BOF could not be found. Please ensure the compiled BOF (.o file) exists in the same folder as this aggressor script");
+			return;
+		}
 		beacon_inline_execute($1, $data, "go", $args);
 	}else{
 		$DLLhandle = openf(script_resource("dist/NPPSPY.dll"));
